@@ -34,7 +34,20 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
     db.knex.schema.createTable('clicks', function (click) {
       click.increments('id').primary();
       click.integer('link_id');
+      click.integer('user_id');
       click.timestamps();
+    }).then(function (table) {
+      console.log('Created Table', table);
+    });
+  }
+});
+
+db.knex.schema.hasTable('users').then(function(exists) {
+  if (!exists) {
+    db.knex.schema.createTable('users', function (user) {
+      user.increments('id').primary();
+      user.integer('link_id');
+      user.string('name', 30);
     }).then(function (table) {
       console.log('Created Table', table);
     });
