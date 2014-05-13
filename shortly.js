@@ -20,9 +20,14 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
+  res.render('login');
+});
+app.get('/signup', function(req, res) {
   res.render('signup');
 });
-
+app.get('/index', function(req, res) {
+  res.render('index');
+});
 app.get('/create', function(req, res) {
   res.render('index');
 });
@@ -67,13 +72,30 @@ app.post('/links', function(req, res) {
 });
 
 app.post('/signup', function(req, res) {
+  var user = new User({username: req.body.username,password : req.body.password});
+  user.save().then(function(newUser){
+    Users.add(newUser);
+    //TODO :- redirect to index page for the user.
+  });
+
+});
 
 
-      var user = new User({username: req.body.username,password : req.body.password});
-      user.save().then(function(newUser){
-        Users.add(newUser);
-
+app.post('/login', function(req, res) {
+  var user = new User({username: req.body.username});
+  user.fetch().then(function(user){
+      console.log("user after fetch :",user);
+      user.checkPassword(req.body.password)
+      .then(function(match){
+        console.log('match',match);
+        // Render index of the set users
+      })
+      .catch(function(err){
+        console.log('err',err);
+        //Show invalid password and render login page
       });
+    });
+});
 
     //Get username and password from req.body
     // var username = req.body.username;
@@ -109,7 +131,6 @@ app.post('/signup', function(req, res) {
     // new Link({ url: uri }).fetch().then(function(found) {
     //   if (found) {
     //     res.send(200, found.attributes);
-    });
 
 
 
