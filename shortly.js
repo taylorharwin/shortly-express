@@ -16,10 +16,13 @@ app.configure(function() {
   app.set('view engine', 'ejs');
   app.use(partials());
   app.use(express.bodyParser())
+  app.use(express.cookieParser('hello'))
+  app.use(express.session())
   app.use(express.static(__dirname + '/public'));
 });
 
 app.get('/', function(req, res) {
+
   res.render('login');
 });
 app.get('/signup', function(req, res) {
@@ -88,6 +91,15 @@ app.post('/login', function(req, res) {
       user.checkPassword(req.body.password)
       .then(function(match){
         console.log('match',match);
+        if(match){
+          req.session.regenerate(function(){
+            req.session.user =  user.username;
+            res.redirect('/index');
+          });
+        }else{
+          console.log("Invalid Password");
+          res.redirect('/login');
+        }
         // Render index of the set users
       })
       .catch(function(err){

@@ -13,13 +13,15 @@ var Link = db.Model.extend({
     return this.hasMany(Click);
   },
   users: function() {
-    return this.hasMany(User);
+    return this.belongsTo(User,'user_id');
   },
   initialize: function(){
     this.on('creating', function(model, attrs, options){
       var shasum = crypto.createHash('sha1');
       shasum.update(model.get('url'));
       model.set('code', shasum.digest('hex').slice(0, 5));
+      console.log(model.clicks());
+      // model.set('user_id',)
     });
   }
 });

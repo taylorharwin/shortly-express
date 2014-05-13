@@ -8,9 +8,6 @@ var Click = db.Model.extend({
   link: function() {
     return this.belongsTo(Link, 'link_id');
   },
-  user:function(){
-    return this.belongsTo(User, 'user_id');
-  }
 });
 
 module.exports = Click;
