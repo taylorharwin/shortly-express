@@ -20,7 +20,7 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('signup');
 });
 
 app.get('/create', function(req, res) {
@@ -65,6 +65,54 @@ app.post('/links', function(req, res) {
     }
   });
 });
+
+app.post('/signup', function(req, res) {
+
+
+      var user = new User({username: req.body.username,password : req.body.password});
+      user.save().then(function(newUser){
+        Users.add(newUser);
+
+      });
+
+    //Get username and password from req.body
+    // var username = req.body.username;
+
+
+    // new User({name: username,}).fetch().then(function(found){
+    //   if(found){
+
+    //   }else{
+    //     var user = new User(username, req.body.password);
+    //   }
+    // })
+
+    //Hash password
+    //Create a new user in user table with {username}
+    //Fetch user from table based on username
+    //if username found
+      //Check if hashed pw matches user-provided hashed_pw
+        // render Index
+      // else
+        // re render login (with message invalid password)
+    // else
+      // render sign up
+
+
+
+
+    // if (!util.isValidUrl(uri)) {
+    //   console.log('Not a valid url: ', uri);
+    //   return res.send(404);
+    // }
+
+    // new Link({ url: uri }).fetch().then(function(found) {
+    //   if (found) {
+    //     res.send(200, found.attributes);
+    });
+
+
+
 
 /************************************************************/
 // Write your authentication routes here
