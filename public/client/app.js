@@ -26,6 +26,13 @@ window.Shortly = Backbone.View.extend({
     this.router.navigate('/', { trigger: true });
   },
 
+  failure: function() {
+    this.$el.find('.message')
+      .html('That password is incorrect, bub.')
+      .addClass('error');
+    return this;
+  },
+
   renderCreateView: function(e){
     e && e.preventDefault();
     this.router.navigate('/create', { trigger: true });

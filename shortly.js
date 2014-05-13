@@ -58,17 +58,22 @@ app.post('/links', function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
+        new User({username : req.session.user}).fetch()
+        .then(function(currentUser){
+      //    console.log("in POST /link :",currentUser.get('id'));
+          var link = new Link({
+            url: uri,
+            title: title,
+            base_url: req.headers.origin,
+            user_id:currentUser.get('id')
+          });
 
-        var link = new Link({
-          url: uri,
-          title: title,
-          base_url: req.headers.origin
+          link.save().then(function(newLink) {
+            Links.add(newLink);
+            res.send(200, newLink);
+          });
         });
 
-        link.save().then(function(newLink) {
-          Links.add(newLink);
-          res.send(200, newLink);
-        });
       });
     }
   });
@@ -93,7 +98,7 @@ app.post('/login', function(req, res) {
         console.log('match',match);
         if(match){
           req.session.regenerate(function(){
-            req.session.user =  user.username;
+            req.session.user =  user.get('username');
             res.redirect('/index');
           });
         }else{
