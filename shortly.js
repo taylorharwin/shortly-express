@@ -22,8 +22,16 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
-
+  if(req.session.userid){
+    res.redirect('/index');
+  }
   res.render('login');
+});
+app.get('/logout', function(req, res) {
+  req.session.destroy(function(){
+        res.redirect('/');
+    });
+
 });
 app.get('/signup', function(req, res) {
   res.render('signup');
@@ -36,7 +44,11 @@ app.get('/create', function(req, res) {
 });
 
 app.get('/links', function(req, res) {
-  Links.reset().fetch().then(function(links) {
+  Links
+    .reset()
+    .query('where','user_id',req.session.userid)
+    .fetch()
+    .then(function(links) {
     res.send(200, links.models);
   })
 });
@@ -58,21 +70,18 @@ app.post('/links', function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
-        new User({username : req.session.user}).fetch()
-        .then(function(currentUser){
-      //    console.log("in POST /link :",currentUser.get('id'));
-          var link = new Link({
-            url: uri,
-            title: title,
-            base_url: req.headers.origin,
-            user_id:currentUser.get('id')
-          });
-
-          link.save().then(function(newLink) {
-            Links.add(newLink);
-            res.send(200, newLink);
-          });
+        var link = new Link({
+          url: uri,
+          title: title,
+          base_url: req.headers.origin,
+          user_id: req.session.userid
         });
+
+        link.save().then(function(newLink) {
+          Links.add(newLink);
+          res.send(200, newLink);
+        });
+
 
       });
     }
@@ -98,7 +107,7 @@ app.post('/login', function(req, res) {
         console.log('match',match);
         if(match){
           req.session.regenerate(function(){
-            req.session.user =  user.get('username');
+            req.session.userid =  user.get('id');
             res.redirect('/index');
           });
         }else{
