@@ -46,7 +46,7 @@ db.knex.schema.hasTable('users').then(function(exists) {
   if (!exists) {
     db.knex.schema.createTable('users', function (user) {
       user.increments('id').primary();
-      user.string('username', 30);
+      user.string('username', 30).unique();
       user.string('password',30);
     }).then(function (table) {
       console.log('Created Table', table);

@@ -22,26 +22,53 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
-  if(req.session.userid){
-    res.redirect('/index');
+  if(!req.session.userid){
+    res.redirect('/login');
+    return;
   }
-  res.render('login');
+  res.redirect('/index');
 });
-app.get('/logout', function(req, res) {
-  req.session.destroy(function(){
-        res.redirect('/');
-    });
 
+app.get('/login', function(req, res) {
+
+    res.render('login');
 });
+
+
+app.get('/logout', function(req, res) {
+  if(!req.session.userid){
+    res.redirect('/login');
+    return;
+  }
+  req.session.destroy(function(){
+    res.redirect('/');
+  });
+});
+
+
 app.get('/signup', function(req, res) {
   res.render('signup');
 });
+
+
 app.get('/index', function(req, res) {
+  if(!req.session.userid){
+    res.redirect('/login');
+    return;
+  }
   res.render('index');
 });
+
+
 app.get('/create', function(req, res) {
+
+  if(!req.session.userid){
+    res.redirect('/login');
+    return;
+  }
   res.render('index');
 });
+
 
 app.get('/links', function(req, res) {
   Links
@@ -49,6 +76,7 @@ app.get('/links', function(req, res) {
     .query('where','user_id',req.session.userid)
     .fetch()
     .then(function(links) {
+
     res.send(200, links.models);
   })
 });
@@ -57,19 +85,20 @@ app.post('/links', function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
-    console.log('Not a valid url: ', uri);
     return res.send(404);
   }
 
-  new Link({ url: uri }).fetch().then(function(found) {
+  new Link({ url: uri })
+  .query('where','user_id',req.session.userid)
+  .fetch().then(function(found) {
     if (found) {
       res.send(200, found.attributes);
     } else {
       util.getUrlTitle(uri, function(err, title) {
         if (err) {
-          console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
+        util.getFavicon(uri);
         var link = new Link({
           url: uri,
           title: title,
@@ -101,26 +130,26 @@ app.post('/signup', function(req, res) {
 app.post('/login', function(req, res) {
   var user = new User({username: req.body.username});
   user.fetch().then(function(user){
-      console.log("user after fetch :",user);
-      user.checkPassword(req.body.password)
-      .then(function(match){
-        console.log('match',match);
-        if(match){
-          req.session.regenerate(function(){
-            req.session.userid =  user.get('id');
-            res.redirect('/index');
-          });
-        }else{
-          console.log("Invalid Password");
+        if(!user){
           res.redirect('/login');
+        }else{
+
+          user.checkPassword(req.body.password)
+          .then(function(match){
+            if(match){
+              req.session.regenerate(function(){
+                req.session.userid =  user.get('id');
+                res.redirect('/index');
+              });
+            }else{
+              res.redirect('/login');
+            }
+          })
+          .catch(function(err){
+            //Show invalid password and render login page
+          });
         }
-        // Render index of the set users
-      })
-      .catch(function(err){
-        console.log('err',err);
-        //Show invalid password and render login page
       });
-    });
 });
 
     //Get username and password from req.body
@@ -150,7 +179,6 @@ app.post('/login', function(req, res) {
 
 
     // if (!util.isValidUrl(uri)) {
-    //   console.log('Not a valid url: ', uri);
     //   return res.send(404);
     // }
 
@@ -195,5 +223,4 @@ app.get('/*', function(req, res) {
   });
 });
 
-console.log('Shortly is listening on 4568');
 app.listen(4568);

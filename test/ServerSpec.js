@@ -26,7 +26,7 @@ describe('', function() {
 
     // delete link for roflzoo from db so it can be created later for the test
     db.knex('urls')
-      .where('url', '=', 'http://www.roflzoo.com/')
+      .where('url', '=', 'http://www.facebook.com/')
       .del()
       .catch(function(error) {
         throw {
@@ -37,26 +37,26 @@ describe('', function() {
 
     // delete user Svnh from db so it can be created later for the test
     db.knex('users')
-      .where('username', '=', 'Svnh')
+      .where('username', '=', 'taylor')
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        throw {
+          type: 'DatabaseError',
+          message: 'Failed to create test setup data'
+        };
       });
 
     // delete user Phillip from db so it can be created later for the test
     db.knex('users')
-      .where('username', '=', 'Phillip')
+      .where('username', '=', 'taylor')
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        throw {
+          type: 'DatabaseError',
+          message: 'Failed to create test setup data'
+        };
       });
   });
 
@@ -64,7 +64,7 @@ describe('', function() {
 
     var requestWithSession = request.defaults({jar: true});
 
-    xbeforeEach(function(done){
+    beforeEach(function(done){
       // create a user that we can then log-in with
       new User({
           'username': 'Phillip',
@@ -238,7 +238,7 @@ describe('', function() {
 
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function(){
+  describe('Account Creation:', function(){
 
     it('Signup creates a user record', function(done) {
       var options = {
@@ -286,7 +286,7 @@ describe('', function() {
 
   }); // 'Account Creation'
 
-  xdescribe('Account Login:', function(){
+  describe('Account Login:', function(){
 
     var requestWithSession = request.defaults({jar: true});
 

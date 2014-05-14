@@ -13,16 +13,12 @@ var User = db.Model.extend({
     },
 
     checkPassword: function(password){
-      console.log('userpass :',password);
-      console.log('storedPass :',this.get('password'));
       return compare(password,this.get('password'));
 
     },
 
     initialize: function(user){
       // this.on('creating', function(model, attrs, options){
-        console.log('username :',user.username);
-        console.log('password :',user.password);
         // var salt = username;  // just to have a unique salt for each user
         var userModel = this;
 
@@ -31,7 +27,6 @@ var User = db.Model.extend({
             throw err;
           } else {
             userModel.set('password',hash);
-            console.log(userModel);
           }
         });
       // });
